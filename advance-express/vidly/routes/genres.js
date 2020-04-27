@@ -19,7 +19,7 @@ const moviesSchema = new mongoose.Schema({
     uppercase: true,
     minlength: 5,
   },
-  cntry: {
+  country: {
     type: String,
     required: true,
     trim: true,
@@ -80,7 +80,7 @@ router.post("/", async (req, res) => {
 
   let genre = new Movies({
     name: req.body.name,
-    cntry: req.body.country,
+    country: req.body.country,
     rating: req.body.rating,
     genres: req.body.genres,
   });
