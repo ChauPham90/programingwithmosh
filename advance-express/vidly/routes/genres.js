@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const Joi = require("joi");
 const mongoose = require("mongoose");
+const { Movies, validate } = require("../models/genre");
+mongoose.set("useFindAndModify", false);
 
 mongoose
   .connect("mongodb://localhost/vidly", {
@@ -11,50 +12,12 @@ mongoose
   .then(() => console.log("connecting to vidly database"))
   .catch(() => console.log("can not connect to DB"));
 
-const moviesSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    trim: true,
-    uppercase: true,
-    minlength: 5,
-  },
-  country: {
-    type: String,
-    required: true,
-    trim: true,
-    uppercase: true,
-    minlength: 5,
-  },
-  length: {
-    type: Number,
-    set: (v) => Math.round(v),
-  },
-  rating: {
-    type: Number,
-  },
-  genres: {
-    type: String,
-    enum: ["Action", "Commedy", "Horror", "Romance", "Dramma", "Fantasy"],
-    upercase: true,
-    required: function (value) {
-      return value && value.length > 5;
-    },
-  },
-});
-// const genres = [
-//   { id: 1, name: "Action" },
-//   { id: 2, name: "Horror" },
-//   { id: 3, name: "Romance" },
-// ];
-
-const Movies = new mongoose.model("vidly", moviesSchema);
-
 async function createMovie() {
   const movie = new Movies({
-    name: "The Mandalorian",
-    country: "california",
-    rating: 4.8,
+    name: "Tom & Jerry",
+    country: "american",
+    length: 150,
+    rating: 5.0,
     genres: "Fantasy",
   });
   try {
@@ -66,7 +29,6 @@ async function createMovie() {
     }
   }
 }
-
 //createMovie();
 
 router.get("/", async (req, res) => {
@@ -75,12 +37,13 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  const { error } = validateGenre(req.body);
+  const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0]);
 
   let genre = new Movies({
     name: req.body.name,
     country: req.body.country,
+    length: req.body.length,
     rating: req.body.rating,
     genres: req.body.genres,
   });
@@ -88,42 +51,45 @@ router.post("/", async (req, res) => {
   res.send(genre);
 });
 
-router.put("/:id", (req, res) => {
-  const genre = genres.find((c) => c.id === parseInt(req.params.id));
-  if (!genre)
-    return res.status(404).send("The genre with the given ID was not found.");
-
-  const { error } = validateGenre(req.body);
+router.put("/:id", async (req, res) => {
+  const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  genre.name = req.body.name;
-  res.send(genre);
-});
+  const genre = await Movies.findByIdAndUpdate(
+    req.params.id,
+    {
+      $set: {
+        name: req.body.name,
+        country: req.body.country,
+        length: req.body.length,
+        rating: req.body.rating,
+        genres: req.body.genres,
+      },
+    },
+    { new: true }
+  );
 
-router.delete("/:id", (req, res) => {
-  const genre = genres.find((c) => c.id === parseInt(req.params.id));
   if (!genre)
     return res.status(404).send("The genre with the given ID was not found.");
 
-  const index = genres.indexOf(genre);
-  genres.splice(index, 1);
+  //genre.name = req.body.name;
+  res.send(genre);
+});
+
+router.delete("/:id", async (req, res) => {
+  const genre = await Movies.findByIdAndDelete(req.params.id);
+
+  if (!genre)
+    return res.status(404).send("The genre with the given ID was not found.");
 
   res.send(genre);
 });
 
-router.get("/:id", (req, res) => {
-  const genre = genres.find((c) => c.id === parseInt(req.params.id));
+router.get("/:id", async (req, res) => {
+  const genre = await Movies.findById(req.params.id);
   if (!genre)
     return res.status(404).send("The genre with the given ID was not found.");
   res.send(genre);
 });
-
-function validateGenre(genre) {
-  const schema = {
-    name: Joi.string().min(3).required(),
-  };
-
-  return Joi.validate(genre, schema);
-}
 
 module.exports = router;
