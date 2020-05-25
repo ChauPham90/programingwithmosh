@@ -1,18 +1,8 @@
 const _ = require("lodash");
 const express = require("express");
 const router = express.Router();
-const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const { Users, validate } = require("../models/user");
-
-mongoose
-  .connect("mongodb://localhost/vidly", {
-    useUnifiedTopology: true,
-    useNewUrlParser: true,
-    useCreateIndex: true,
-  })
-  .then(() => console.log("connecting to user DB"))
-  .catch(() => console.log("can not connect to user DB"));
 
 router.get("/", async (req, res) => {
   const users = await Users.find().sort("name");

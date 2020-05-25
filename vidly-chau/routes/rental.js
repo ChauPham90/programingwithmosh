@@ -7,15 +7,6 @@ const { Movies } = require("../models/movies");
 const { Genres } = require("../models/nestedGenres");
 const { Customers } = require("../models/customer");
 
-mongoose
-  .connect("mongodb://localhost/vidly", {
-    useUnifiedTopology: true,
-    useNewUrlParser: true,
-    useFindAndModify: true,
-  })
-  .then(() => console.log("connecting to rental"))
-  .catch(() => console.log("can not connect to rental"));
-
 Fawn.init(mongoose);
 
 async function createRenral(customer, movie, dateOut, dateReturn, fee) {
@@ -28,7 +19,7 @@ async function createRenral(customer, movie, dateOut, dateReturn, fee) {
   });
   try {
     const result = await rental.save();
-    console.log(result);
+    //console.log(result);
   } catch (ex) {
     for (n in ex.errors) {
       console.log(ex.errors[n]);

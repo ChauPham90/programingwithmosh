@@ -3,14 +3,6 @@ const customer = express.Router();
 const mongoose = require("mongoose");
 const { Customers, validate } = require("../models/customer");
 
-mongoose
-  .connect("mongodb://localhost/vidly", {
-    useUnifiedTopology: true,
-    useNewUrlParser: true,
-  })
-  .then(() => console.log("connecting to vidly.customers"))
-  .catch(() => console.log("can not connect to vidly.customers"));
-
 async function createCustomer() {
   const customer = new Customers({
     isGold: false,
