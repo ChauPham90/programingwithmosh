@@ -4,14 +4,6 @@ const mongoose = require("mongoose");
 const { Movies, validate } = require("../models/genre");
 mongoose.set("useFindAndModify", false);
 
-mongoose
-  .connect("mongodb://localhost/vidly", {
-    useUnifiedTopology: true,
-    useNewUrlParser: true,
-  })
-  .then(() => console.log("connecting to vidly database"))
-  .catch(() => console.log("can not connect to DB"));
-
 async function createMovie() {
   const movie = new Movies({
     name: "Tom & Jerry",
@@ -22,7 +14,7 @@ async function createMovie() {
   });
   try {
     const result = await movie.save();
-    console.log(result);
+    // console.log(result);
   } catch (ex) {
     for (n in ex.errors) {
       console.log(ex.errors[n]);

@@ -1,16 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const mongoose = require("mongoose");
 const { Movies, validate } = require("../models/movies");
 const { Genres } = require("../models/nestedGenres");
-
-mongoose
-  .connect("mongodb://localhost/vidly", {
-    useUnifiedTopology: true,
-    useNewUrlParser: true,
-  })
-  .then(() => console.log("connecting to movie"))
-  .catch(() => console.log("can not connect to movie"));
 
 async function createGenres(name) {
   const genre = new Genres({ name });
@@ -35,7 +26,7 @@ async function createMovies(title, genres, numberInStock, dailyRentalRate) {
 
 async function listMovie() {
   const movie = await Movies.find().select("name title").populate("genre");
-  console.log(movie);
+  // console.log(movie);
 }
 
 listMovie();
