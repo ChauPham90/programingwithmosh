@@ -1,5 +1,4 @@
 const Joi = require("joi");
-const _ = require("lodash");
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
@@ -17,7 +16,8 @@ router.post("/", async (req, res) => {
   const validPassword = await bcrypt.compare(req.body.password, user.password); //return true /false
   if (!validPassword)
     return res.status("400").send("invalid email or password");
-  res.send(true);
+  const token = await user.gennerateAuthToken();
+  res.send(token);
 });
 
 const validate = (req) => {

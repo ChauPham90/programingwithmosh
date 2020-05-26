@@ -1,6 +1,6 @@
+const config = require("config");
 const Joi = require("joi");
 const mongoose = require("mongoose");
-
 Joi.objectId = require("joi-objectid")(Joi);
 const express = require("express");
 const app = express();
@@ -19,6 +19,11 @@ mongoose
   })
   .then(() => console.log("Connected to MongoDB..."))
   .catch((err) => console.error("Could not connect to MongoDB..."));
+
+if (!config.get("jwtPriviteKey")) {
+  console.error("FALTAL ERROR: jwtPriviteKey is not defined");
+  process.exit(1);
+}
 
 app.use(express.json());
 app.use("/api/genres", genres);

@@ -1,3 +1,5 @@
+const config = require("config");
+const jwt = require("jsonwebtoken");
 const _ = require("lodash");
 const express = require("express");
 const router = express.Router();
@@ -25,7 +27,11 @@ router.post("/", async (req, res) => {
 
   user = await user.save();
   try {
-    res.send(_.pick(req.body, ["_id", "name", "email"]));
+    const token = await user.generateAuthToken();
+
+    res
+      .header("x-auth-token", token)
+      .send(_.pick(req.body, ["_id", "name", "email"]));
   } catch (ex) {
     return console.error(ex);
   }
